@@ -1,0 +1,160 @@
+name: bootstrap-sync
+on:
+  push:
+    branches:
+      - workbench/core-mvp-v0.1
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: workbench/core-mvp-v0.1
+      - name: Restore validated implementation tree
+        shell: bash
+        run: |
+          cat > /tmp/pncw.b64 <<'B64'
+          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[...snip...]
+          mQCYAwA=
+          B64
+          base64 -d /tmp/pncw.b64 | tar -xz
+          rm -f .github/workflows/bootstrap-sync.yml
+      - name: Commit synchronized implementation
+        shell: bash
+        run: |
+          git config user.name "OpenAI ChatGPT"
+          git config user.email "chatgpt@openai.invalid"
+          git add -A
+          git commit -m "feat: synchronize validated PNCW Core MVP v0.1"
+          git push origin HEAD:workbench/core-mvp-v0.1
