@@ -1,0 +1,12 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://evemisslab.com/pncw/projection-request/v1.schema.json","type":"object","additionalProperties":false,
+  "required":["schema","requestId","sourceRef","observer","representation","scope","requestedMode","authorityContext"],
+  "properties":{
+    "schema":{"const":"pncw-projection-request/v1"},"requestId":{"type":"string","minLength":1},"sourceRef":{"type":"string","minLength":1},
+    "observer":{"type":"object","additionalProperties":false,"required":["observerId","observerType","profile"],"properties":{"observerId":{"type":"string","minLength":1},"observerType":{"enum":["human","ai","service"]},"profile":{"type":"string","minLength":1}}},
+    "representation":{"type":"object","additionalProperties":false,"required":["profile","protocolVersion"],"properties":{"profile":{"type":"string","minLength":1},"protocolVersion":{"type":"string","minLength":1}}},
+    "scope":{"type":"object","additionalProperties":false,"required":["scopeId","regionRefs"],"properties":{"scopeId":{"type":"string","minLength":1},"regionRefs":{"type":"array","items":{"type":"string","minLength":1}}}},
+    "requestedMode":{"enum":["human_preview","machine_carrier","structured_manifest"]},
+    "authorityContext":{"type":"object","additionalProperties":false,"required":["principalId","sourceRead","surfaceProject"],"properties":{"principalId":{"type":"string","minLength":1},"sourceRead":{"type":"boolean"},"surfaceProject":{"type":"boolean"}}}
+  }
+}

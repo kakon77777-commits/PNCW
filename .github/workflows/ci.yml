@@ -1,0 +1,81 @@
+name: PNCW Core MVP CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'workbench/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Core conformance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PNCW
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.5.1'
+          cache: npm
+
+      - name: Install frozen dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Dependency audit
+        run: npm audit --audit-level=moderate
+
+      - name: Static check
+        run: npm run check
+
+      - name: Full PNCW test suite
+        run: npm test
+
+  mrmic-phase14-gate:
+    name: Actual MRMIC Phase 14 checkout gate
+    runs-on: ubuntu-latest
+    needs: core
+    steps:
+      - name: Checkout PNCW
+        uses: actions/checkout@v4
+        with:
+          path: pncw
+
+      - name: Checkout MRMIC/NVCL main
+        uses: actions/checkout@v4
+        with:
+          repository: kakon77777-commits/MRMIC_NVCL
+          ref: main
+          path: mrmic
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.5.1'
+
+      - name: Install and build MRMIC/NVCL
+        working-directory: mrmic
+        run: |
+          npm ci
+          npm run check
+          npm run build
+
+      - name: Install and build PNCW
+        working-directory: pncw
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+          npm run build
+
+      - name: Run full PNCW suite with actual MRMIC checkout enabled
+        working-directory: pncw
+        env:
+          PNCW_MRMIC_DIST_ROOT: ${{ github.workspace }}/mrmic/dist
+        run: npm run test:built

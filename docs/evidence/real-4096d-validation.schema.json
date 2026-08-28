@@ -1,0 +1,20 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://evemisslab.com/schemas/pncw-real-4096d-evidence-v0.1.json",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema","freshHdsrcRuntimeExecuted","hdsrcReleaseSha256","source","decision","materialization","partial","pncw","visibility","mrmic","semanticEvidenceDigest"],
+  "properties":{
+    "schema":{"const":"pncw-real-4096d-evidence/v0.1"},
+    "freshHdsrcRuntimeExecuted":{"const":true},
+    "hdsrcReleaseSha256":{"pattern":"^[0-9a-f]{64}$","type":"string"},
+    "source":{"type":"object","additionalProperties":false,"required":["id","revision","digest","dimension","nodeCount","relationCount"],"properties":{"id":{"type":"string"},"revision":{"type":"integer","minimum":0},"digest":{"pattern":"^sha256:[0-9a-f]{64}$","type":"string"},"dimension":{"type":"integer","minimum":1},"nodeCount":{"type":"integer","minimum":1},"relationCount":{"type":"integer","minimum":1}}},
+    "decision":{"type":"object"},
+    "materialization":{"type":"object","additionalProperties":false,"required":["id","carrierProfile","logicalScale","spatializationId","materializationDigest"],"properties":{"id":{"type":"string"},"carrierProfile":{"const":"HMBT1"},"logicalScale":{"type":"integer","minimum":1},"spatializationId":{"type":"string"},"materializationDigest":{"pattern":"^sha256:[0-9a-f]{64}$","type":"string"}}},
+    "partial":{"type":"object","additionalProperties":false,"required":["compressedBytesRead","carrierBytes","relationCount","payloadDigest"],"properties":{"compressedBytesRead":{"type":"integer","minimum":1},"carrierBytes":{"type":"integer","minimum":1},"relationCount":{"type":"integer","minimum":1},"payloadDigest":{"pattern":"^sha256:[0-9a-f]{64}$","type":"string"}}},
+    "pncw":{"type":"object","additionalProperties":false,"required":["resultId","manifestDigest","verificationDigest","visibilityCommitId"],"properties":{"resultId":{"type":"string"},"manifestDigest":{"type":"string"},"verificationDigest":{"type":"string"},"visibilityCommitId":{"type":"string"}}},
+    "visibility":{"type":"object","additionalProperties":false,"required":["state","residentFraction","events"],"properties":{"state":{"const":"VISIBLE"},"residentFraction":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1},"events":{"const":1}}},
+    "mrmic":{"type":"object","additionalProperties":false,"required":["mode","actualCheckoutExecuted","upstreamCompatibility"],"properties":{"mode":{"type":"string"},"actualCheckoutExecuted":{"type":"boolean"},"upstreamCompatibility":{"type":"string"}}},
+    "semanticEvidenceDigest":{"pattern":"^sha256:[0-9a-f]{64}$","type":"string"}
+  }
+}

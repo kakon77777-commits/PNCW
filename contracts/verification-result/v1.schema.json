@@ -1,0 +1,20 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://evemisslab.com/pncw/verification-result/v1.schema.json",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema","resultId","verified","manifestDigest","checks","verificationDigest"],
+  "properties":{
+    "schema":{"const":"pncw-verification-result/v1"},
+    "resultId":{"type":"string","minLength":1},
+    "verified":{"type":"boolean"},
+    "manifestDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "checks":{"type":"array","items":{"$ref":"#/$defs/check"}},
+    "failure":{"$ref":"#/$defs/errorEnvelope"},
+    "verificationDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs":{
+    "check":{"type":"object","additionalProperties":false,"required":["name","passed"],"properties":{"name":{"type":"string","minLength":1},"passed":{"type":"boolean"},"detail":{"type":"string","minLength":1}}},
+    "errorEnvelope":{"type":"object","additionalProperties":false,"required":["schema","code","stage","retryable","source","message"],"properties":{"schema":{"const":"pncw-error/v1"},"code":{"enum":["INVALID_REQUEST","UNAUTHORIZED","UNSUPPORTED","SOURCE_UNAVAILABLE","STALE_SOURCE","INTEGRITY_FAILURE","MATERIALIZATION_FAILED","SURFACE_UNAVAILABLE","VERSION_CONFLICT","VERIFICATION_FAILED","INVALID_TRANSITION","ALREADY_VISIBLE","ABORTED"]},"stage":{"enum":["REQUEST","SOURCE","READINESS","MATERIALIZATION","SURFACE","MANIFEST","VERIFICATION","VISIBILITY","RECOVERY"]},"retryable":{"type":"boolean"},"source":{"enum":["pncw","hdsrc","mrmic"]},"message":{"type":"string","minLength":1},"causeRef":{"type":"string","minLength":1}}}
+  }
+}
