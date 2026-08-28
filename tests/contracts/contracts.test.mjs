@@ -36,15 +36,15 @@ test('all six schema documents are present and closed', async () => {
   }
 })
 
-test('Ajv validates all six schemas when dependency is installed', async t => {
-  let Ajv
+test('Ajv validates all six Draft 2020-12 schemas when dependency is installed', async t => {
+  let Ajv2020
   try {
-    ;({ default: Ajv } = await import('ajv'))
+    ;({ default: Ajv2020 } = await import('ajv/dist/2020.js'))
   } catch {
     t.skip('Ajv unavailable in offline local execution; GitHub CI runs this check')
     return
   }
-  const ajv = new Ajv({ allErrors: true, strict: true })
+  const ajv = new Ajv2020({ allErrors: true, strict: true })
   const paths = [
     'contracts/projection-request/v1.schema.json','contracts/projection-manifest/v1.schema.json',
     'contracts/readiness-result/v1.schema.json','contracts/verification-result/v1.schema.json',
