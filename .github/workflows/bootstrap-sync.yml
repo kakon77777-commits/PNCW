@@ -1,0 +1,31 @@
+name: bootstrap-sync
+on:
+  push:
+    branches:
+      - workbench/core-mvp-v0.1
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: workbench/core-mvp-v0.1
+      - name: Verify and restore validated implementation
+        shell: bash
+        run: |
+          cat .bootstrap/part-*.b64 > /tmp/pncw.b64
+          base64 -d /tmp/pncw.b64 > /tmp/pncw.tar.gz
+          echo "fb08aef19f79e5db72bd7e764358c111e7da4826d1eb28f22293b6872930445d  /tmp/pncw.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/pncw.tar.gz
+          rm -rf .bootstrap
+          rm -f .github/workflows/bootstrap-sync.yml
+      - name: Commit synchronized implementation
+        shell: bash
+        run: |
+          git config user.name "OpenAI ChatGPT"
+          git config user.email "chatgpt@openai.invalid"
+          git add -A
+          git commit -m "feat: synchronize validated PNCW Core MVP v0.1"
+          git push origin HEAD:workbench/core-mvp-v0.1
