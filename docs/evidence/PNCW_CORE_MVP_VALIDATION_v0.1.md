@@ -1,18 +1,19 @@
-# PNCW Core MVP v0.1 — Validation Report
+# PNCW Core MVP v0.1 — Final Validation Report
 
 **Date:** 2026-08-29 (Asia/Taipei)  
 **Repository:** `kakon77777-commits/PNCW`  
 **PR:** `#1 — PNCW Core MVP v0.1 — projection lifecycle and verified visibility commit`  
-**Validated executable/config head:** `d23e3168afdc38bef2f63aeb1cd3d36974165b69`  
-**Scope:** Projection Lifecycle + Verified Visibility Commit
+**Validated pre-report implementation head:** `bd948fe3e977cc8d5a553e7a1e81abf52d59ae0b`  
+**Final validation workflow before this documentation-only seal:** `33195259884`  
+**Scope:** `Projection Lifecycle + Verified Visibility Commit`
 
 ---
 
-## 1. Final result
+## 1. Closure result
 
-**PNCW Core MVP v0.1: PASS for the declared Core MVP scope.**
+**PNCW Core MVP v0.1 = PASS for the declared Core MVP scope.**
 
-The validated implementation demonstrates:
+The validated implementation closes:
 
 \[
 \boxed{
@@ -35,20 +36,14 @@ The validated implementation demonstrates:
 while preserving:
 
 \[
-\boxed{
-Ready\neq Projected\neq Verified\neq Visible
-}
+\boxed{Ready\neq Projected\neq Verified\neq Visible}
 \]
-
-and:
 
 \[
-\boxed{
-Visible\neq Resident.
-}
+\boxed{Visible\neq Resident}
 \]
 
-The release claim remains limited to:
+The release claim is limited to:
 
 \[
 \boxed{
@@ -58,46 +53,40 @@ The release claim remains limited to:
 }
 \]
 
-This report does **not** claim full PNCW Paper 00–08 perception/cognition/actuation closure.
+It does **not** claim full PNCW Paper 00–08 perception/cognition/actuation closure.
 
 ---
 
-## 2. Evidence model
+## 2. Evidence classes remain separate
 
-Validation is deliberately separated into independent evidence layers. No layer is used to impersonate another.
+Validation deliberately keeps three evidence layers distinct.
 
-### Layer A — PNCW deterministic/conformance runtime
+### Layer A — PNCW Core runtime / conformance
 
 Validates:
 
-- six closed versioned JSON contracts;
+- six versioned Draft 2020-12 JSON contracts;
+- closed top-level and relevant nested contract objects;
 - deterministic RID / MID / VID / VCID;
-- lifecycle transition rules;
-- source/surface authority separation;
-- readiness semantics;
-- immutable projection manifest;
-- fresh independent verification;
-- idempotent visibility commit;
+- lifecycle transitions;
+- readiness ordering;
+- independent source and surface authority;
+- immutable manifest construction;
+- fresh verification;
+- live-proof-bound visibility commit;
+- idempotent VCID;
 - partial residency after logical visibility;
-- stale/integrity/mixed-version/rebinding/restart negative controls.
+- negative controls for stale/integrity/mixed-version/rebinding/restart.
 
-### Layer B — Fresh canonical HDSRC v0.10 4096D execution
+### Layer B — Fresh canonical HDSRC v0.10 execution
 
-A fresh local execution used the canonical HDSRC v0.10 release source and canonical 4096D fixture to produce the committed evidence artifact.
+A fresh local run used the canonical HDSRC v0.10 release and canonical 4096D HDS1 fixture, then fed the resulting materialization/partial-read evidence into the PNCW lifecycle.
 
-This layer validates real HDSRC planning/materialization/partial-read behavior and then feeds that evidence into the PNCW Core lifecycle.
+### Layer C — Actual MRMIC/NVCL checkout compatibility
 
-### Layer C — Actual MRMIC/NVCL checkout compatibility gate
+GitHub Actions checks out actual `kakon77777-commits/MRMIC_NVCL@main`, installs/builds it, and executes the PNCW external-checkout gate against its compiled Phase 14 exports.
 
-GitHub Actions checks out actual `kakon77777-commits/MRMIC_NVCL@main`, installs/builds it, and executes the PNCW external-checkout test against its compiled Phase 14 exports.
-
-This proves real source compatibility with:
-
-- `LocalProcessHdsrcProvider`;
-- `createHdsrcMaterializationPortal(...)`;
-- current `native_resource_portal_v1` binding shape.
-
-### Explicit non-collapse of evidence classes
+Therefore:
 
 \[
 \boxed{
@@ -107,31 +96,36 @@ This proves real source compatibility with:
 }
 \]
 
-The current validation does not claim that all three systems were executed in one fresh same-process/same-workspace end-to-end run.
+The current MVP does **not** claim one fresh same-process HDSRC + MRMIC + PNCW three-system execution.
 
 ---
 
-## 3. Frozen dependency and security gate
+## 3. Final dependency/security freeze
 
-Final CI uses:
+Final dependency policy:
 
-- Node.js `22.5.1`;
-- npm `10.8.2`;
-- committed `package-lock.json`;
-- `npm ci --ignore-scripts` for PNCW;
-- Ajv `8.18.0`;
-- TypeScript `5.8.3`.
+```text
+Node.js >= 22.5.0
+CI Node = 22.5.1
+npm = 10.8.2
+TypeScript = 5.8.3
+Ajv = 8.18.0
+install = npm ci --ignore-scripts
+```
 
-Ajv was upgraded from 8.17.1 to 8.18.0 before closure so the Core MVP does not seal with the known 8.17.1 moderate ReDoS advisory.
-
-Final CI dependency audit:
+Ajv was upgraded from 8.17.1 to patched 8.18.0 before closure. Final CI runs:
 
 ```text
 npm audit --audit-level=moderate
+```
+
+Result:
+
+```text
 found 0 vulnerabilities
 ```
 
-The CI-generated Ajv-8.18.0 lockfile used for the committed dependency freeze had SHA-256:
+The CI-generated Ajv-8.18.0 lockfile used for the dependency freeze had SHA-256:
 
 ```text
 b6b0d6533b2d38cdb4b9c3474f561d52047d70736848e9a33b9966fdb03d15c4
@@ -139,7 +133,72 @@ b6b0d6533b2d38cdb4b9c3474f561d52047d70736848e9a33b9966fdb03d15c4
 
 ---
 
-## 4. Final GitHub Actions validation
+## 4. Contract-schema hardening closure
+
+Final PR self-review found one important contract-evidence mismatch: top-level schemas were closed, but several nested readiness/verification objects were still generic JSON objects while the TypeScript/runtime contracts were strict.
+
+The affected shapes were:
+
+- `readiness-result.capabilitySnapshot.source`;
+- `readiness-result.capabilitySnapshot.surface`;
+- `readiness-result.blockingError`;
+- `verification-result.failure`.
+
+This was repaired with a strict TDD cycle rather than by weakening Ajv.
+
+### RED
+
+Commit:
+
+```text
+39bdb6040c22b9c981966add47f0f19b2510d315
+```
+
+Workflow:
+
+```text
+33195165091
+```
+
+Result:
+
+```text
+46 tests
+43 PASS
+1 FAIL
+2 SKIP
+```
+
+The only failure was the intentionally new assertion:
+
+```text
+source capability snapshot must reject unknown nested field
+```
+
+All pre-existing runtime behaviors remained green.
+
+### GREEN
+
+Schema fixes:
+
+```text
+6f542263c3f20f058d081760527abc117ee870d5 — close nested readiness objects
+bd948fe3e977cc8d5a553e7a1e81abf52d59ae0b — close verification failure object
+```
+
+Final pre-report validation workflow:
+
+```text
+33195259884
+```
+
+Both jobs passed.
+
+This closes the claim that the six Core contracts are validated with strict Draft 2020-12 schemas and fail closed on undeclared fields at the modeled nested boundaries.
+
+---
+
+## 5. Final GitHub Actions results
 
 Workflow:
 
@@ -147,18 +206,16 @@ Workflow:
 PNCW Core MVP CI
 ```
 
-Final frozen-dependency validation run:
+Run:
 
 ```text
-run id: 33194709545
-head:   d23e3168afdc38bef2f63aeb1cd3d36974165b69
+33195259884
+head: bd948fe3e977cc8d5a553e7a1e81abf52d59ae0b
 ```
 
-Both jobs completed successfully.
+### 5.1 Core conformance — PASS
 
-### 4.1 Core conformance — PASS
-
-Commands/gates:
+Gates:
 
 ```text
 npm ci --ignore-scripts
@@ -167,72 +224,72 @@ npm run check
 npm test
 ```
 
-Results:
+Result:
 
 ```text
 TypeScript check: PASS
 Ajv Draft 2020-12 strict validation: PASS
-Dependency audit: 0 vulnerabilities
-45 tests
-43 PASS
+all-six positive contract fixtures: PASS
+nested contract closedness: PASS
+dependency audit: 0 vulnerabilities
+46 tests
+44 PASS
 0 FAIL
 2 SKIP
 ```
 
-The two Core-job skips are intentional environment-specific gates:
+The two intentional Core-job skips are environment-specific:
 
-1. actual MRMIC checkout test — executed separately in the second CI job;
-2. fresh HDSRC 4096D test — requires the canonical HDSRC release/root and is backed by the separately committed fresh-execution evidence.
+1. actual MRMIC checkout test — executed in the second CI job;
+2. fresh-HDSRC-in-CI test — the canonical HDSRC release is not stored in the PNCW repository and is backed by separate fresh execution evidence.
 
-They are not failed Core behaviors.
+### 5.2 Actual MRMIC Phase 14 checkout gate — PASS
 
-### 4.2 Actual MRMIC Phase 14 checkout gate — PASS
-
-The CI job checked out:
+Actual checkout:
 
 ```text
-kakon77777-commits/MRMIC_NVCL
+repository: kakon77777-commits/MRMIC_NVCL
 ref: main
 commit: 1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b
 ```
 
-MRMIC/NVCL validation in that job:
+MRMIC/NVCL:
 
 ```text
 npm ci: PASS
 npm run check: PASS
 npm run build: PASS
-npm install/audit result: 0 vulnerabilities
+npm audit/install result: 0 vulnerabilities
 ```
 
-PNCW was then built with frozen dependencies and the complete built test suite was executed with:
+PNCW then ran with:
 
 ```text
 PNCW_MRMIC_DIST_ROOT=<actual MRMIC checkout>/dist
 ```
 
-Results:
+Result:
 
 ```text
-45 tests
-44 PASS
+46 tests
+45 PASS
 0 FAIL
 1 SKIP
 ```
 
-The previously skipped external MRMIC checkout test executed and passed:
+The actual external-checkout test executed and passed:
 
 ```text
 actual MRMIC checkout exports Phase 14 local-process provider and portal factory — PASS
 ```
 
-The only remaining skip in this job is the fresh-HDSRC-in-CI test because the HDSRC release fixture is not stored in the PNCW repository.
+The only remaining skip is fresh-HDSRC-in-CI.
 
 ---
 
-## 5. Fresh HDSRC v0.10 4096D evidence
+## 6. Fresh HDSRC v0.10 4096D evidence
 
-Committed evidence:
+Committed artifact:
 
 ```text
 artifacts/real-4096d-validation.json
@@ -244,7 +301,7 @@ Raw artifact SHA-256:
 dffeaf70a76c054c6e0da777feec5f1e297d97c1bca57777e4f2c6b97e849208
 ```
 
-Semantic evidence digest embedded in the artifact:
+Embedded semantic evidence digest:
 
 ```text
 sha256:8eb4c800332a80990bb7623cac4a8df84483fe0687c2e44715edca4dfec7487b
@@ -256,7 +313,7 @@ Canonical HDSRC v0.10 release ZIP SHA-256:
 583659487a25cd76a7a3a32a35fda373074e630c3f7f60e47c618358bbb1c217
 ```
 
-Canonical 4096D HDS1 source digest:
+Canonical 4096D HDS1 digest:
 
 ```text
 sha256:ea48a90eddc727b1684cf72204ddeaa720c6b67fe036561e05537622b0c12f85
@@ -266,35 +323,35 @@ Decoded source:
 
 ```text
 dimension = 4096
-nodes     = 72
+nodes = 72
 relations = 576
-revision  = 10
+revision = 10
 ```
 
-Real HPCM2 result:
+Real HPCM2:
 
 ```text
-decision       = oracle_fallback
+decision = oracle_fallback
 requiresOracle = true
-reason          = outside_current_trust_region
+reason = outside_current_trust_region
 ```
 
-Resolved HMR1/HMBT1 materialization:
+HMR1/HMBT1 resolution:
 
 ```text
-carrier          = HMBT1
-logicalScale     = 32
+carrier = HMBT1
+logicalScale = 32
 spatializationId = RCM_PP
-carrier bytes    = 286313
-materialization digest = sha256:4127f98f00cca7d85d2975e13186a2373814dbe0b53d611cf74215695e9e6c5b
+carrierBytes = 286313
+materializationDigest = sha256:4127f98f00cca7d85d2975e13186a2373814dbe0b53d611cf74215695e9e6c5b
 ```
 
-Partial relation block-row read:
+Partial relation block-row:
 
 ```text
-compressed bytes read = 1272
-carrier bytes          = 286313
-relations returned     = 256
+compressedBytesRead = 1272
+carrierBytes = 286313
+relations = 256
 ```
 
 Thus:
@@ -305,25 +362,25 @@ Thus:
 
 or approximately **0.444%** of the full carrier byte count for this validated workload.
 
-This is a workload-specific executable result, not a universal asymptotic claim.
+This is a workload-specific executable result, not a universal scaling claim.
 
 ---
 
-## 6. PNCW atomic visibility evidence
+## 7. Atomic visibility evidence
 
-The same committed fresh-HDSRC evidence records:
+The committed fresh evidence records:
 
 ```text
 resultId = pncw:result:096296cee4e33f565198c658c60fe78f7881437916fe807dfd3b7f6ca5bd1f8f
 manifestDigest = sha256:c8d2ad40603774629d147624efa2ba748b822830488b10acdc1ab616c36eb28d
 verificationDigest = sha256:7948a833d6a6701cd8152966924a917ed212c9770f7f51227d26546c1453ce62
 visibilityCommitId = pncw:visibility:d7f9330b84ca08287beba7f6bbffa5c1220bcda709b5ba92c0d796464fa2bafb
-visibility state = VISIBLE
-semantic visibility events = 1
+visibilityState = VISIBLE
+semanticVisibilityEvents = 1
 residentFraction = 0.0000034926688880040796
 ```
 
-Therefore the MVP contains an executable instance of:
+Therefore this MVP contains an executable instance of:
 
 \[
 \boxed{
@@ -333,44 +390,45 @@ ResidentFraction<1
 }
 \]
 
-without claiming that physical output cost is constant or zero.
+without claiming physical O(1) output.
 
 ---
 
-## 7. Required negative-control closure
+## 8. Negative-control closure
 
-The test suite includes and passes controls for:
+The final suite passes controls for:
 
-- unknown contract fields fail closed;
-- illegal lifecycle shortcuts fail;
-- `READY -> VISIBLE` is rejected;
-- `PROJECTED -> VISIBLE` is rejected;
-- source-read denial occurs before protected resolution;
-- surface authority remains independently checked;
-- unsupported observation lanes fail closed;
-- valid changed source maps to retryable stale state;
-- structural integrity failure remains non-retryable;
-- mixed source/materialization/surface lineage maps to `VERSION_CONFLICT`;
-- wrong manifest digest does not verify;
-- invalid root residency does not verify;
-- self-consistent metadata cannot override provider structural failure;
-- full metadata/digest rebinding cannot authorize a non-canonical carrier;
-- serialized cached `VERIFIED` JSON cannot blind recommit without a live verification proof;
-- provider restart requires re-resolution/reverification;
-- source becoming stale after assembly blocks later verification;
-- duplicate VCID is idempotent and yields one semantic visibility event;
-- `visibleAt` does not alter VCID semantic identity.
+- unknown top-level contract fields;
+- unknown modeled nested readiness/verification fields;
+- illegal lifecycle shortcuts;
+- `READY -> VISIBLE` rejection;
+- `PROJECTED -> VISIBLE` rejection;
+- source-read denial before protected resolution;
+- independent surface authority;
+- unsupported observation mode;
+- retryable stale source;
+- non-retryable structural integrity failure;
+- mixed source/materialization/surface lineage;
+- wrong manifest digest;
+- invalid root residency;
+- provider structural failure despite self-consistent metadata;
+- full metadata/digest rebinding against canonical carrier semantics;
+- serialized cached `VERIFIED` JSON blind-recommit prevention;
+- provider restart requiring re-resolution/reverification;
+- source becoming stale after assembly;
+- duplicate VCID idempotency;
+- `visibleAt` exclusion from VCID identity.
 
-Two hardening tests found real implementation defects during development:
+Two hardening tests also found real implementation defects during development:
 
 1. full metadata rebinding was initially accepted by the fake structural verifier;
-2. serialized cached verification data could initially be presented for blind recommit.
+2. serialized cached verification data could initially blind recommit.
 
-Both defects were corrected before final validation.
+Both were fixed before final closure.
 
 ---
 
-## 8. Authority boundary validation
+## 9. Authority boundary
 
 The validated runtime preserves:
 
@@ -391,24 +449,30 @@ PNCW does not expose or invent:
 - provider authorization;
 - world mutation commit.
 
-The real adapter delegates HDSRC materialization and partial-read semantics to the Phase 14-compatible provider surface instead of implementing HMBT1 semantics inside PNCW.
+The real adapter delegates HDSRC materialization and partial-read semantics to the Phase 14-compatible provider surface rather than reimplementing HMBT1 semantics inside PNCW.
 
 ---
 
-## 9. MRMIC evidence boundary
+## 10. MRMIC evidence boundary
 
-The fresh HDSRC 4096D run used a source-grounded Phase 14 portal-factory fixture at the MRMIC surface boundary. The committed evidence therefore explicitly records:
+The fresh 4096D execution deliberately records:
 
 ```text
 mrmic.mode = source-grounded-portal-factory
 mrmic.actualCheckoutExecuted = false
 ```
 
-This is intentional evidence honesty.
+That fresh run therefore does not impersonate an actual MRMIC checkout.
 
-Separately, GitHub Actions run `33194709545` checked out and built actual `MRMIC_NVCL/main@1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b`, then executed the PNCW external-checkout compatibility test successfully.
+Separately, CI run `33195259884` checked out and built actual:
 
-Accordingly, the validated claim is:
+```text
+MRMIC_NVCL/main@1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b
+```
+
+and the external Phase 14 compatibility gate passed.
+
+The correct engineering claim is:
 
 \[
 \boxed{
@@ -418,70 +482,66 @@ Accordingly, the validated claim is:
 }
 \]
 
-and **not**:
-
-\[
-\text{fresh same-process HDSRC + MRMIC + PNCW three-system E2E}.
-\]
+not a fresh same-process three-system E2E claim.
 
 ---
 
-## 10. What is proven by this MVP
+## 11. What this MVP proves
 
-For the declared scope, the implementation demonstrates that PNCW can:
+For the declared Core scope, PNCW can:
 
-1. keep external canonical authority outside PNCW;
-2. resolve and readiness-check a projection before surface preparation;
-3. bind a non-visible projection surface;
-4. assemble deterministic immutable manifest identity;
-5. independently verify source/materialization/surface lineage;
-6. require live, non-serializable verification proof for visibility promotion;
-7. atomically promote a verified root result to observer-visible authority;
+1. keep canonical source/surface authority outside PNCW;
+2. readiness-check before surface preparation;
+3. bind a non-visible surface;
+4. assemble deterministic immutable result/manifest identity;
+5. independently re-check source/materialization/surface lineage;
+6. require a live non-serializable verification proof for visibility promotion;
+7. atomically promote a verified root manifest to observer-visible authority;
 8. remain idempotent under duplicate VCID commit;
-9. keep logical visibility separate from full physical residency;
-10. preserve upstream stale/integrity distinctions;
-11. remain compatible with actual MRMIC Phase 14 exports.
+9. remain logically visible while detail regions are not fully resident;
+10. preserve stale/integrity distinctions;
+11. remain compatible with actual MRMIC Phase 14 exports;
+12. enforce closed contract schemas consistent with runtime types at modeled boundaries.
 
 ---
 
-## 11. Explicit non-claims
+## 12. Explicit non-claims
 
-This validation does not establish:
+This report does not establish:
 
-- full PNCW perception–cognition–actuation loop closure;
-- GCM-driven dynamic projection planning;
+- full PNCW perception–cognition–actuation closure;
+- GCM dynamic planning integration;
 - ACR ActiveCognitiveDomain integration;
 - CSPMF/APR perception routing;
-- PHOSPHOR/HVAP governed actuation;
+- PHOSPHOR/HVAP actuation;
 - canonical HDSRC writeback;
-- Canvas pixel edit → HDSRC symbolic mutation;
+- Canvas pixel edit -> HDSRC symbolic mutation;
 - production multi-tenant security certification;
-- universal HDSRC scaling or performance superiority;
-- a fresh same-process three-system HDSRC+MRMIC+PNCW E2E run;
+- universal HDSRC performance superiority;
+- fresh same-process HDSRC + MRMIC + PNCW three-system E2E;
 - replacement of autoregressive computation;
 - physical O(1) output.
 
 ---
 
-## 12. Closure decision
-
-Within the Core MVP scope:
+## 13. Final closure matrix
 
 ```text
-Contracts                     PASS
-Draft 2020-12 strict schemas  PASS
-Deterministic identity        PASS
-Lifecycle                     PASS
-Readiness                     PASS
-Projection manifest           PASS
-Independent verification      PASS
-Visibility commit             PASS
-Partial residency             PASS
-Negative controls             PASS
-Fresh HDSRC v0.10 evidence    PASS
-Actual MRMIC checkout gate    PASS
-Frozen dependency install     PASS
-Moderate dependency audit     PASS (0 vulnerabilities)
+Six v1 contracts                    PASS
+Draft 2020-12 strict schemas        PASS
+Modeled nested schema closedness    PASS
+Deterministic identity              PASS
+Lifecycle                           PASS
+Readiness                           PASS
+Projection manifest                 PASS
+Independent verification            PASS
+Visibility commit                   PASS
+Partial residency                   PASS
+Negative controls                   PASS
+Fresh HDSRC v0.10 evidence          PASS
+Actual MRMIC checkout gate          PASS
+Frozen dependency install           PASS
+Moderate dependency audit           PASS (0 vulnerabilities)
 ```
 
 Final result:
@@ -504,4 +564,4 @@ for:
 }
 \]
 
-The next engineering phase may build on this sealed core rather than redefining it.
+The next engineering phase may build on this sealed Core rather than redefining it.
