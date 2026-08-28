@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://evemisslab.com/pncw/visibility-state/v1.schema.json","type":"object","additionalProperties":false,
+  "required":["schema","resultId","state"],
+  "properties":{"schema":{"const":"pncw-visibility-state/v1"},"resultId":{"type":"string","minLength":1},"state":{"enum":["REQUESTED","RESOLVED","READY","PROJECTED","VERIFIED","VISIBLE","STALE","INTEGRITY_FAILURE","UNAUTHORIZED","UNSUPPORTED","UNAVAILABLE","CONFLICT","ABORTED","SUPERSEDED"]},"visibilityCommitId":{"type":"string","minLength":1},"revealMode":{"enum":["ATOMIC_ARTIFACT","SEMANTIC_BATCH","STREAM","HYBRID"]},"visibleAt":{"type":"string","minLength":1},"supersedes":{"type":"string","minLength":1}}
+}

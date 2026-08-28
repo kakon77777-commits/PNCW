@@ -1,0 +1,26 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://evemisslab.com/pncw/projection-manifest/v1.schema.json","type":"object","additionalProperties":false,
+  "required":["schema","resultId","sourceIdentity","projectionProfile","materializationRefs","surfaceRefs","integrityRefs","authorityRefs","residencyMap","version","manifestDigest"],
+  "properties":{
+    "schema":{"const":"pncw-projection-manifest/v1"},"resultId":{"type":"string","minLength":1},
+    "sourceIdentity":{"$ref":"#/$defs/sourceIdentity"},
+    "projectionProfile":{"type":"object","additionalProperties":false,"required":["observer","representation","scope","requestedMode"],"properties":{"observer":{"$ref":"#/$defs/observer"},"representation":{"$ref":"#/$defs/representation"},"scope":{"$ref":"#/$defs/scope"},"requestedMode":{"enum":["human_preview","machine_carrier","structured_manifest"]}}},
+    "materializationRefs":{"type":"array","items":{"$ref":"#/$defs/materialization"}},
+    "surfaceRefs":{"type":"array","items":{"$ref":"#/$defs/surface"}},
+    "integrityRefs":{"type":"array","items":{"$ref":"#/$defs/integrity"}},
+    "authorityRefs":{"type":"array","items":{"$ref":"#/$defs/authority"}},
+    "residencyMap":{"type":"array","items":{"$ref":"#/$defs/residency"}},
+    "version":{"type":"integer","minimum":1},"manifestDigest":{"pattern":"^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs":{
+    "sourceIdentity":{"type":"object","additionalProperties":false,"required":["authority","sourceId","revision","digest"],"properties":{"authority":{"type":"string","minLength":1},"sourceId":{"type":"string","minLength":1},"revision":{"type":"integer","minimum":0},"digest":{"pattern":"^sha256:[0-9a-f]{64}$"}}},
+    "observer":{"type":"object","additionalProperties":false,"required":["observerId","observerType","profile"],"properties":{"observerId":{"type":"string","minLength":1},"observerType":{"enum":["human","ai","service"]},"profile":{"type":"string","minLength":1}}},
+    "representation":{"type":"object","additionalProperties":false,"required":["profile","protocolVersion"],"properties":{"profile":{"type":"string","minLength":1},"protocolVersion":{"type":"string","minLength":1}}},
+    "scope":{"type":"object","additionalProperties":false,"required":["scopeId","regionRefs"],"properties":{"scopeId":{"type":"string","minLength":1},"regionRefs":{"type":"array","items":{"type":"string","minLength":1}}}},
+    "materialization":{"type":"object","additionalProperties":false,"required":["provider","materializationId","sourceId","sourceRevision","sourceDigest","carrierProfile","materializationDigest","machineResourceUri","previewResourceUri","partialRead"],"properties":{"provider":{"type":"string","minLength":1},"materializationId":{"type":"string","minLength":1},"sourceId":{"type":"string","minLength":1},"sourceRevision":{"type":"integer","minimum":0},"sourceDigest":{"pattern":"^sha256:[0-9a-f]{64}$"},"carrierProfile":{"type":"string","minLength":1},"materializationDigest":{"pattern":"^sha256:[0-9a-f]{64}$"},"machineResourceUri":{"type":"string","minLength":1},"previewResourceUri":{"type":"string","minLength":1},"partialRead":{"type":"boolean"}}},
+    "surface":{"type":"object","additionalProperties":false,"required":["provider","surfaceId","portalSchema","sourceId","sourceRevision","sourceDigest","materializationId","materializationDigest","bindingDigest","visible"],"properties":{"provider":{"type":"string","minLength":1},"surfaceId":{"type":"string","minLength":1},"portalSchema":{"type":"string","minLength":1},"sourceId":{"type":"string","minLength":1},"sourceRevision":{"type":"integer","minimum":0},"sourceDigest":{"pattern":"^sha256:[0-9a-f]{64}$"},"materializationId":{"type":"string","minLength":1},"materializationDigest":{"pattern":"^sha256:[0-9a-f]{64}$"},"bindingDigest":{"pattern":"^sha256:[0-9a-f]{64}$"},"visible":{"type":"boolean"}}},
+    "integrity":{"type":"object","additionalProperties":false,"required":["provider","kind","structuralVerified"],"properties":{"provider":{"type":"string","minLength":1},"kind":{"type":"string","minLength":1},"digest":{"pattern":"^sha256:[0-9a-f]{64}$"},"structuralVerified":{"type":"boolean"}}},
+    "authority":{"type":"object","additionalProperties":false,"required":["provider","principalId","grant","authorized"],"properties":{"provider":{"type":"string","minLength":1},"principalId":{"type":"string","minLength":1},"grant":{"type":"string","minLength":1},"authorized":{"type":"boolean"}}},
+    "residency":{"type":"object","additionalProperties":false,"required":["regionRef","state"],"properties":{"regionRef":{"type":"string","minLength":1},"state":{"enum":["DECLARED","AVAILABLE","RESIDENT","UNAVAILABLE","INVALID"]},"bytesResident":{"type":"integer","minimum":0},"bytesTotal":{"type":"integer","minimum":0}}}
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://evemisslab.com/pncw/error-envelope/v1.schema.json","type":"object","additionalProperties":false,
+  "required":["schema","code","stage","retryable","source","message"],
+  "properties":{"schema":{"const":"pncw-error/v1"},"code":{"enum":["INVALID_REQUEST","UNAUTHORIZED","UNSUPPORTED","SOURCE_UNAVAILABLE","STALE_SOURCE","INTEGRITY_FAILURE","MATERIALIZATION_FAILED","SURFACE_UNAVAILABLE","VERSION_CONFLICT","VERIFICATION_FAILED","INVALID_TRANSITION","ALREADY_VISIBLE","ABORTED"]},"stage":{"enum":["REQUEST","SOURCE","READINESS","MATERIALIZATION","SURFACE","MANIFEST","VERIFICATION","VISIBILITY","RECOVERY"]},"retryable":{"type":"boolean"},"source":{"enum":["pncw","hdsrc","mrmic"]},"message":{"type":"string","minLength":1},"causeRef":{"type":"string","minLength":1}}
+}

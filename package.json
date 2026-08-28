@@ -1,0 +1,20 @@
+{
+  "name": "pncw-core-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.5.0" },
+  "workspaces": ["packages/*", "adapters/*", "examples/*"],
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test:built": "node scripts/run-tests.mjs",
+    "test": "npm run build && npm run test:built",
+    "ci": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "ajv": "8.17.1",
+    "typescript": "5.8.3"
+  }
+}

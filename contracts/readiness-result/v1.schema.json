@@ -1,0 +1,6 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://evemisslab.com/pncw/readiness-result/v1.schema.json","type":"object","additionalProperties":false,
+  "required":["schema","requestId","ready","checks","sourceSnapshot","capabilitySnapshot"],
+  "properties":{"schema":{"const":"pncw-readiness-result/v1"},"requestId":{"type":"string","minLength":1},"ready":{"type":"boolean"},"checks":{"type":"array","items":{"$ref":"#/$defs/check"}},"blockingError":{"type":"object"},"sourceSnapshot":{"$ref":"#/$defs/sourceIdentity"},"capabilitySnapshot":{"type":"object","additionalProperties":false,"required":["source","surface"],"properties":{"source":{"type":"object"},"surface":{"type":"object"}}}},
+  "$defs":{"check":{"type":"object","additionalProperties":false,"required":["name","passed"],"properties":{"name":{"type":"string","minLength":1},"passed":{"type":"boolean"},"detail":{"type":"string","minLength":1}}},"sourceIdentity":{"type":"object","additionalProperties":false,"required":["authority","sourceId","revision","digest"],"properties":{"authority":{"type":"string","minLength":1},"sourceId":{"type":"string","minLength":1},"revision":{"type":"integer","minimum":0},"digest":{"pattern":"^sha256:[0-9a-f]{64}$"}}}}
+}
