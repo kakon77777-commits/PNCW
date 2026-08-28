@@ -21,6 +21,7 @@ jobs:
           tar -xzf /tmp/pncw.tar.gz
           rm -rf .bootstrap
           rm -f .github/workflows/bootstrap-sync.yml
+          rm -f .github/workflows/ci.yml
       - name: Commit synchronized implementation
         shell: bash
         run: |
