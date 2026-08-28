@@ -262,9 +262,7 @@ Conceptual fields:
 ```text
 schema
 resultId
-sourceIdentity
-sourceRevision
-sourceDigest
+sourceIdentity { authority, sourceId, revision, digest }
 projectionProfile
 materializationRefs
 surfaceRefs
@@ -275,7 +273,9 @@ version
 manifestDigest
 ```
 
-Once `VERIFIED`, its semantic contents are immutable.
+`manifestDigest` is computed over a canonical **manifest payload** that excludes the `manifestDigest` field itself and excludes non-semantic runtime metadata such as generation timestamps. There is no self-referential digest.
+
+Once `VERIFIED`, the semantic manifest payload is immutable.
 
 ### 8.3 Readiness Result
 
@@ -302,7 +302,10 @@ verified
 manifestDigest
 checks[]
 failure?
+verificationDigest
 ```
+
+`verificationDigest` is computed over a canonical verification payload excluding its own digest and non-semantic runtime timestamps.
 
 ### 8.5 Visibility State
 
@@ -317,6 +320,8 @@ revealMode?
 visibleAt?
 supersedes?
 ```
+
+`visibleAt` is observational/audit metadata and MUST NOT contribute to semantic identity.
 
 Visibility state is observer-facing lifecycle state, not canonical world state.
 
@@ -562,15 +567,33 @@ ProtocolVersion
 
 ### 14.3 Manifest Identity
 
+Let `ManifestPayload` denote the canonical semantic manifest with `manifestDigest` and non-semantic runtime metadata excluded:
+
 \[
 \boxed{
 MID
 =
-H(CanonicalProjectionManifest)
+H(ManifestPayload)
 }
 \]
 
-### 14.4 Visibility Commit Identity
+The stored `manifestDigest` MUST equal `MID`.
+
+### 14.4 Verification Identity
+
+Let `VerificationPayload` denote the canonical semantic verification result with `verificationDigest` and non-semantic runtime metadata excluded:
+
+\[
+\boxed{
+VID
+=
+H(VerificationPayload)
+}
+\]
+
+The stored `verificationDigest` MUST equal `VID`.
+
+### 14.5 Visibility Commit Identity
 
 \[
 \boxed{
@@ -579,7 +602,7 @@ VCID
 H(
 RID,
 MID,
-VerifiedState,
+VID,
 RevealMode
 )
 }
@@ -592,6 +615,7 @@ Therefore:
 SourceID
 \neq ResultID
 \neq ManifestID
+\neq VerificationID
 \neq VisibilityCommitID
 }
 \]
@@ -609,12 +633,14 @@ and:
 For fixed semantic input:
 
 - `RID` MUST be deterministic;
-- manifest digest MUST be deterministic;
-- visibility commit identity MUST be deterministic.
+- `MID` / manifest digest MUST be deterministic;
+- `VID` / verification digest MUST be deterministic;
+- `VCID` MUST be deterministic.
 
 The following MUST NOT contribute to semantic identity:
 
 - wall-clock generation timestamp;
+- `visibleAt`;
 - process ID;
 - transient temp path;
 - random nonce without semantic role.
@@ -787,6 +813,7 @@ VISIBLE + root manifest INVALID
 
 - a `VERIFIED` result;
 - the matching immutable manifest;
+- the matching `VID`;
 - a valid reveal mode;
 - the expected deterministic visibility commit identity.
 
@@ -1017,7 +1044,8 @@ The MVP is complete only when all are satisfied.
 ### 29.3 Determinism
 
 - fixed semantic input produces stable `RID`;
-- fixed manifest produces stable manifest digest;
+- fixed manifest payload produces stable `MID`;
+- fixed verification payload produces stable `VID`;
 - fixed verified result produces stable `VCID`;
 - non-semantic timestamps do not affect identity.
 
@@ -1177,6 +1205,7 @@ Every end-to-end result SHOULD carry:
 requestId
 resultId
 manifestId
+verificationId
 visibilityCommitId
 source authority/id/revision
 materialization id
@@ -1234,7 +1263,7 @@ Not allowed:
 \]
 
 \[
-\boxed{SourceID\neq ResultID\neq ManifestID\neq VisibilityCommitID}
+\boxed{SourceID\neq ResultID\neq ManifestID\neq VerificationID\neq VisibilityCommitID}
 \]
 
 \[
