@@ -1,0 +1,75 @@
+name: PNCW three-system E2E closure export
+
+on:
+  push:
+    branches:
+      - integration/v0.1.0-three-system-e2e
+
+permissions:
+  contents: read
+
+jobs:
+  export-runtime-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PNCW
+        uses: actions/checkout@v4
+        with:
+          path: pncw
+
+      - name: Checkout actual MRMIC/NVCL main
+        uses: actions/checkout@v4
+        with:
+          repository: kakon77777-commits/MRMIC_NVCL
+          ref: main
+          path: mrmic
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.5.1'
+
+      - name: Build PNCW
+        working-directory: pncw
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+          npm run build
+
+      - name: Build actual MRMIC/NVCL
+        working-directory: mrmic
+        run: |
+          npm ci
+          npm run check
+          npm run build
+
+      - name: Write provenance snapshot
+        shell: bash
+        run: |
+          mkdir -p closure-snapshot
+          PNCW_SHA=$(git -C pncw rev-parse HEAD)
+          MRMIC_SHA=$(git -C mrmic rev-parse HEAD)
+          cat > closure-snapshot/snapshot-manifest.json <<EOF
+          {
+            "schema": "pncw-three-system-export-snapshot/v0.1",
+            "pncwCommit": "${PNCW_SHA}",
+            "mrmicCommit": "${MRMIC_SHA}",
+            "nodeVersion": "22.5.1"
+          }
+          EOF
+          mkdir -p closure-snapshot/pncw closure-snapshot/mrmic
+          cp -R pncw/dist closure-snapshot/pncw/dist
+          cp pncw/package.json pncw/package-lock.json closure-snapshot/pncw/
+          cp -R mrmic/dist closure-snapshot/mrmic/dist
+          cp -R mrmic/scripts closure-snapshot/mrmic/scripts
+          cp -R mrmic/contracts closure-snapshot/mrmic/contracts
+          cp mrmic/package.json mrmic/package-lock.json closure-snapshot/mrmic/
+          cp -R mrmic/node_modules closure-snapshot/mrmic/node_modules
+
+      - name: Upload exact runtime snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pncw-three-system-closure-snapshot
+          path: closure-snapshot
+          if-no-files-found: error
+          retention-days: 1
