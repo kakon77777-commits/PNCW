@@ -50,7 +50,7 @@ Temporary snapshot-export commit:
 c1ad5c23a18f330782de6fd7d36348ac935f7df3
 ```
 
-The snapshot-export commit adds only the temporary exporter workflow; the executable PNCW implementation is the already merged Core MVP baseline.
+The snapshot-export commit added only the temporary exporter workflow; the PNCW executable implementation was the already merged Core MVP baseline. The exporter workflow was deleted before the closure PR, so it is not part of the final integration diff.
 
 Actual MRMIC/NVCL checkout:
 
@@ -58,12 +58,12 @@ Actual MRMIC/NVCL checkout:
 1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b
 ```
 
-GitHub Actions runtime-snapshot artifact:
+GitHub Actions runtime snapshot:
 
 ```text
+export workflow run: 33245718254
 artifact id: 9712765010
 artifact SHA-256: 8a73093e1218b2efa5471868127c2374aacffffd67aef7faacc896cf2f9542b3
-export workflow run: 33245718254
 ```
 
 Canonical HDSRC v0.10 release ZIP:
@@ -102,7 +102,7 @@ Fresh upstream validation artifact SHA-256:
 30439128924de4f588347d05b104e2cc6658ef823456edb1b6b57c3210843b9e
 ```
 
-This sanity gate prevents an upstream HDSRC/MRMIC failure from being misclassified as a PNCW integration failure.
+This gate prevents an upstream HDSRC/MRMIC failure from being misclassified as a PNCW integration failure.
 
 ## 4. Same-run three-system execution
 
@@ -116,13 +116,13 @@ principal     = principal:pncw-real
 
 to the canonical HDS1 file in the extracted v0.10 release.
 
-PNCW then invoked its production external-checkout path. The PNCW adapter dynamically loaded the actual MRMIC build exports, including `LocalProcessHdsrcProvider` and `createHdsrcMaterializationPortal(...)`. The local-process provider launched the actual MRMIC production Python host with `PYTHONPATH` pointed at the canonical HDSRC v0.10 `src` tree.
+PNCW invoked its production external-checkout path. The PNCW adapter dynamically loaded the actual MRMIC build exports, including `LocalProcessHdsrcProvider` and `createHdsrcMaterializationPortal(...)`. The local-process provider launched the actual MRMIC production Python host with `PYTHONPATH` pointed at the canonical HDSRC v0.10 `src` tree.
 
 No test-stub runtime was used.
 
 ## 5. Source and materialization result
 
-Canonical 4096D source:
+Canonical source:
 
 ```text
 stateId       = state:4096
@@ -145,7 +145,7 @@ materializationDigest = sha256:4127f98f00cca7d85d2975e13186a2373814dbe0b53d611cf
 workloadDigest        = sha256:488ae005d04ee7fb8e491e8c1bc205c839615690f97f1118e5e4d0d12ddd510b
 ```
 
-The upstream sanity validator independently confirmed this 4096D route uses HPCM2 `oracle_fallback` and HMR1 resolves the materialization to HMBT1 b32 / `RCM_PP`.
+The upstream production validator independently confirmed that the 4096D route uses HPCM2 `oracle_fallback` and HMR1 resolves to HMBT1 b32 / `RCM_PP`.
 
 ## 6. Partial materialization / residency
 
@@ -154,17 +154,12 @@ Selected relation block-row:
 ```text
 compressedBytesRead = 1272
 carrierBytes         = 286313
+fraction             = 0.004442690342387527
 ```
 
-Therefore:
+This is approximately **0.444%** of the full carrier byte count for this validated workload.
 
-```text
-1272 / 286313 = 0.004442690342387527
-```
-
-or approximately **0.444%** of the carrier byte count for this workload.
-
-This remains a workload-specific executable observation, not a universal scaling law.
+This is a workload-specific executable result, not a universal asymptotic or performance claim.
 
 ## 7. PNCW visibility closure
 
@@ -179,7 +174,7 @@ state = VISIBLE
 residentFraction = 0.0000034926688880040796
 ```
 
-Thus this fresh same-workspace three-system run directly demonstrates:
+Therefore this fresh same-workspace run directly demonstrates:
 
 ```text
 Visible = 1
@@ -187,7 +182,7 @@ AND
 ResidentFraction < 1
 ```
 
-while preserving the PNCW rule that the surface is non-visible before verification and visibility commit.
+while preserving the rule that the surface remains non-visible before independent verification and visibility commit.
 
 ## 8. Deterministic replay
 
@@ -200,7 +195,7 @@ run 1 SHA-256 = 5490d40508b0d80e4c1b22b09524e66213189220d1b2d84343333bc0c8e0f130
 run 2 SHA-256 = 5490d40508b0d80e4c1b22b09524e66213189220d1b2d84343333bc0c8e0f130
 ```
 
-The following all remained identical:
+The following remained identical:
 
 - RID;
 - MID;
@@ -210,7 +205,7 @@ The following all remained identical:
 - materialization digest;
 - workload digest;
 - logical scale;
-- spatialization;
+- spatialization ID;
 - partial-read byte count;
 - carrier byte count;
 - resident fraction.
@@ -223,17 +218,27 @@ Canonical closure artifact:
 artifacts/three-system-e2e-v0.1.0.json
 ```
 
-File SHA-256:
+File SHA-256 after canonical-digest correction:
 
 ```text
-f7307ced2be850f368aefaa120825f66b3252bb05dea3da36f1685401b4de6d4
+7d9da62224b23ea353a781de7971e0966e773761a49e83d7e6a32e0383893340
 ```
 
-Embedded semantic evidence digest:
+Embedded semantic evidence digest, computed with the PNCW Core `sha256Digest(...)` canonicalization:
 
 ```text
-sha256:dce34225c2a59431dbf8cbed5937bffb153824c10e554219dfac0f65dc408666
+sha256:4af48ceb91ae4b0cc1c327e3715c617e094466dbed53cce71625ad28f55273e5
 ```
+
+### 9.1 Cross-language digest hardening
+
+The first closure PR CI run (`33245971511`) correctly rejected the initially committed semantic evidence digest.
+
+The evidence had originally been hashed with Python canonical JSON serialization. PNCW's canonical identity function uses the runtime's JavaScript `JSON.stringify` number representation. The small non-integer `residentFraction` therefore exposed a cross-language numeric-serialization difference.
+
+The failure was isolated to the new evidence-digest test; all other existing and new behavior tests passed. PNCW canonicalization was not changed. Instead, the committed evidence digest was recomputed using the PNCW Core canonical function, making PNCW itself the authority for PNCW semantic evidence identity.
+
+This converts a hidden cross-language reproducibility risk into an explicit conformance gate.
 
 ## 10. Authority and mutation boundary
 
@@ -259,7 +264,7 @@ This closure does not introduce HDSRC canonical writeback, Canvas-pixel-to-symbo
 
 ## 11. What is newly established
 
-Before this closure, the strongest honest statement was:
+Before this closure, the strongest supported statement was:
 
 ```text
 Fresh HDSRC + PNCW execution
@@ -267,7 +272,7 @@ Fresh HDSRC + PNCW execution
 Actual MRMIC checkout compatibility
 ```
 
-After this closure, the following narrower but stronger statement is executable and supported:
+This closure supports the narrower but stronger statement:
 
 ```text
 Fresh canonical HDSRC v0.10
@@ -280,7 +285,7 @@ in one fresh same-workspace execution.
 
 ## 12. Explicit non-claims
 
-This does not establish:
+This validation does not establish:
 
 - full PNCW Paper 00–08 perception/cognition/actuation loop closure;
 - GCM-driven dynamic projection planning;
@@ -290,7 +295,7 @@ This does not establish:
 - canonical HDSRC writeback;
 - Canvas pixel edit → HDSRC symbolic mutation;
 - production multi-tenant security certification;
-- universal HDSRC scaling/performance superiority;
+- universal HDSRC scaling or performance superiority;
 - replacement of autoregressive computation;
 - physical O(1) output.
 
@@ -312,12 +317,8 @@ PNCW visibility commit                    PASS
 Partial physical residency                PASS
 No canonical mutation                     PASS
 Two-run deterministic replay              PASS
+Evidence schema                           PASS
+PNCW-canonical semantic digest gate       REQUIRED BEFORE MERGE
 ```
 
-Final result:
-
-```text
-PNCW v0.1.0 Three-System Fresh E2E Closure = PASS
-```
-
-for the declared read-only projection lifecycle and verified visibility boundary.
+Merge policy for this closure remains fail-closed: the final PR head must pass both the normal Core conformance job and the actual-MRMIC checkout job before integration into `main`.
