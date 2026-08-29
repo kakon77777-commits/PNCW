@@ -47,7 +47,7 @@
     "testStubRuntimeUsed": false
   },
   "schema": "pncw-three-system-e2e-evidence/v0.1",
-  "semanticEvidenceDigest": "sha256:dce34225c2a59431dbf8cbed5937bffb153824c10e554219dfac0f65dc408666",
+  "semanticEvidenceDigest": "sha256:4af48ceb91ae4b0cc1c327e3715c617e094466dbed53cce71625ad28f55273e5",
   "source": {
     "dimension": 4096,
     "nodeCount": 72,
