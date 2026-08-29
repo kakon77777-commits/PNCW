@@ -240,6 +240,37 @@ The failure was isolated to the new evidence-digest test; all other existing and
 
 This converts a hidden cross-language reproducibility risk into an explicit conformance gate.
 
+### 9.2 RED → GREEN evidence-conformance closure
+
+Initial RED run:
+
+```text
+GitHub Actions run: 33245971511
+Core: 49 tests / 46 PASS / 1 FAIL / 2 SKIP
+```
+
+The sole failure was:
+
+```text
+three-system evidence semantic digest excludes only its own digest field
+```
+
+Corrected GREEN run:
+
+```text
+GitHub Actions run: 33246053652
+Core: 49 tests / 47 PASS / 0 FAIL / 2 SKIP
+Actual MRMIC gate: 49 tests / 48 PASS / 0 FAIL / 1 SKIP
+```
+
+The actual-MRMIC job checked out and built:
+
+```text
+MRMIC_NVCL/main@1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b
+```
+
+Both jobs completed successfully after the PNCW-canonical digest correction.
+
 ## 10. Authority and mutation boundary
 
 The closure validates only a **read-only projection/visibility path**.
@@ -318,7 +349,15 @@ Partial physical residency                PASS
 No canonical mutation                     PASS
 Two-run deterministic replay              PASS
 Evidence schema                           PASS
-PNCW-canonical semantic digest gate       REQUIRED BEFORE MERGE
+PNCW-canonical semantic digest gate       PASS
 ```
 
-Merge policy for this closure remains fail-closed: the final PR head must pass both the normal Core conformance job and the actual-MRMIC checkout job before integration into `main`.
+Final result:
+
+```text
+PNCW v0.1.0 Three-System Fresh E2E Closure = PASS
+```
+
+for the declared read-only projection lifecycle and verified visibility boundary.
+
+The final PR head remains subject to the same fail-closed merge policy: both the normal Core conformance job and the actual-MRMIC checkout job must pass on the exact final head before integration into `main`.
