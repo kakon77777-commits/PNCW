@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://evemisslab.com/schemas/pncw-three-system-e2e-evidence-v0.1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","executedFresh","replayCount","replayByteIdentical","provenance","runtime","source","materialization","partialRead","pncw","claimBoundary","semanticEvidenceDigest"],
+  "properties": {
+    "schema": {"const": "pncw-three-system-e2e-evidence/v0.1"},
+    "executedFresh": {"const": true},
+    "replayCount": {"type": "integer", "minimum": 2},
+    "replayByteIdentical": {"const": true},
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pncwExecutableBaseline","pncwSnapshotExportCommit","mrmicCommit","snapshotArtifactSha256","hdsrcReleaseSha256","nodeVersion"],
+      "properties": {
+        "pncwExecutableBaseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "pncwSnapshotExportCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "mrmicCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "snapshotArtifactSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "hdsrcReleaseSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "nodeVersion": {"type": "string", "minLength": 1}
+      }
+    },
+    "runtime": {
+      "type": "object", "additionalProperties": false,
+      "required": ["actualMrmicCheckoutExecuted","actualLocalProcessHdsrcProviderExecuted","actualPythonHostExecuted","testStubRuntimeUsed","canonicalMutation"],
+      "properties": {
+        "actualMrmicCheckoutExecuted": {"const": true},
+        "actualLocalProcessHdsrcProviderExecuted": {"const": true},
+        "actualPythonHostExecuted": {"const": true},
+        "testStubRuntimeUsed": {"const": false},
+        "canonicalMutation": {"const": false}
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["stateId","stateRevision","stateDigest","dimension","nodeCount","relationCount"],
+      "properties": {
+        "stateId": {"const": "state:4096"},
+        "stateRevision": {"const": 10},
+        "stateDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "dimension": {"const": 4096},
+        "nodeCount": {"const": 72},
+        "relationCount": {"const": 576}
+      }
+    },
+    "materialization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["materializationId","carrierProfile","logicalScale","spatializationId","materializationDigest","workloadDigest","carrierBytes"],
+      "properties": {
+        "materializationId": {"type": "string", "minLength": 1},
+        "carrierProfile": {"const": "HMBT1"},
+        "logicalScale": {"const": 32},
+        "spatializationId": {"const": "RCM_PP"},
+        "materializationDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "workloadDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "carrierBytes": {"const": 286313}
+      }
+    },
+    "partialRead": {
+      "type": "object", "additionalProperties": false,
+      "required": ["regionRef","compressedBytesRead","carrierBytes","fractionOfCarrier"],
+      "properties": {
+        "regionRef": {"const": "relation:block-row:0"},
+        "compressedBytesRead": {"const": 1272},
+        "carrierBytes": {"const": 286313},
+        "fractionOfCarrier": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}
+      }
+    },
+    "pncw": {
+      "type": "object", "additionalProperties": false,
+      "required": ["resultId","manifestDigest","verificationDigest","visibilityCommitId","state","residentFraction"],
+      "properties": {
+        "resultId": {"type": "string", "minLength": 1},
+        "manifestDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "verificationDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "visibilityCommitId": {"type": "string", "minLength": 1},
+        "state": {"const": "VISIBLE"},
+        "residentFraction": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}
+      }
+    },
+    "claimBoundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["freshSameWorkspaceThreeSystemE2E","canonicalHdsrcWriteback","worldMutationCommit","universalScalingClaim"],
+      "properties": {
+        "freshSameWorkspaceThreeSystemE2E": {"const": true},
+        "canonicalHdsrcWriteback": {"const": false},
+        "worldMutationCommit": {"const": false},
+        "universalScalingClaim": {"const": false}
+      }
+    },
+    "semanticEvidenceDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
