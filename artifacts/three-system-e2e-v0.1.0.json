@@ -1,0 +1,59 @@
+{
+  "claimBoundary": {
+    "canonicalHdsrcWriteback": false,
+    "freshSameWorkspaceThreeSystemE2E": true,
+    "universalScalingClaim": false,
+    "worldMutationCommit": false
+  },
+  "executedFresh": true,
+  "materialization": {
+    "carrierBytes": 286313,
+    "carrierProfile": "HMBT1",
+    "logicalScale": 32,
+    "materializationDigest": "sha256:4127f98f00cca7d85d2975e13186a2373814dbe0b53d611cf74215695e9e6c5b",
+    "materializationId": "mat:5473af99f81c9810984cafaaac4bf31837c768dcfad517b6fdab81408128a4f8",
+    "spatializationId": "RCM_PP",
+    "workloadDigest": "sha256:488ae005d04ee7fb8e491e8c1bc205c839615690f97f1118e5e4d0d12ddd510b"
+  },
+  "partialRead": {
+    "carrierBytes": 286313,
+    "compressedBytesRead": 1272,
+    "fractionOfCarrier": 0.004442690342387527,
+    "regionRef": "relation:block-row:0"
+  },
+  "pncw": {
+    "manifestDigest": "sha256:c8d2ad40603774629d147624efa2ba748b822830488b10acdc1ab616c36eb28d",
+    "residentFraction": 0.0000034926688880040796,
+    "resultId": "pncw:result:096296cee4e33f565198c658c60fe78f7881437916fe807dfd3b7f6ca5bd1f8f",
+    "state": "VISIBLE",
+    "verificationDigest": "sha256:7948a833d6a6701cd8152966924a917ed212c9770f7f51227d26546c1453ce62",
+    "visibilityCommitId": "pncw:visibility:d7f9330b84ca08287beba7f6bbffa5c1220bcda709b5ba92c0d796464fa2bafb"
+  },
+  "provenance": {
+    "hdsrcReleaseSha256": "583659487a25cd76a7a3a32a35fda373074e630c3f7f60e47c618358bbb1c217",
+    "mrmicCommit": "1c3ec2b137cfe801c47b02cd64cb614f0bbaa97b",
+    "nodeVersion": "22.5.1",
+    "pncwExecutableBaseline": "51b941a23fc5f8b91e0fb55bea5fb766b2051784",
+    "pncwSnapshotExportCommit": "c1ad5c23a18f330782de6fd7d36348ac935f7df3",
+    "snapshotArtifactSha256": "8a73093e1218b2efa5471868127c2374aacffffd67aef7faacc896cf2f9542b3"
+  },
+  "replayByteIdentical": true,
+  "replayCount": 2,
+  "runtime": {
+    "actualLocalProcessHdsrcProviderExecuted": true,
+    "actualMrmicCheckoutExecuted": true,
+    "actualPythonHostExecuted": true,
+    "canonicalMutation": false,
+    "testStubRuntimeUsed": false
+  },
+  "schema": "pncw-three-system-e2e-evidence/v0.1",
+  "semanticEvidenceDigest": "sha256:4af48ceb91ae4b0cc1c327e3715c617e094466dbed53cce71625ad28f55273e5",
+  "source": {
+    "dimension": 4096,
+    "nodeCount": 72,
+    "relationCount": 576,
+    "stateDigest": "sha256:ea48a90eddc727b1684cf72204ddeaa720c6b67fe036561e05537622b0c12f85",
+    "stateId": "state:4096",
+    "stateRevision": 10
+  }
+}
