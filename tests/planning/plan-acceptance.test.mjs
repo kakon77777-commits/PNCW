@@ -37,7 +37,14 @@ async function fixture(){
 }
 
 async function expectFailure(action,code){
-  await assert.rejects(action,error=>error?.failure?.code===code)
+  let result
+  try{
+    result=action()
+  }catch(error){
+    assert.equal(error?.failure?.code,code)
+    return
+  }
+  await assert.rejects(Promise.resolve(result),error=>error?.failure?.code===code)
 }
 
 test('accepts a conformant plan and mints a derived planning receipt', async () => {
