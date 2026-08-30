@@ -73,7 +73,8 @@ test('fake GCM reports deterministic conformance and fails when no candidate is 
   assert.equal(conformance.profileId,'PNCW-FAKE-GCM-R0-M4')
   const tinyBudget=p.buildProjectionBudget({schema:'pncw-projection-budget/v1',hardLimits:{bytes:{unit:'byte',maximum:'1'}}})
   const tinyFrozen=p.buildFrozenPlanningInputRef({schema:'pncw-frozen-planning-input/v1',snapshotRef:'gcm:snapshot:tiny',snapshotDigest:D1,gcmPlanningAuthorityDigest:D2,candidateSetDigest:p.deriveCandidateSetDigest(input.candidates),budgetDigest:p.deriveBudgetDigest(tinyBudget),policyDigest:p.derivePolicyDigest(input.selectionPolicy),provider:'gcm-phase-b',providerContractVersion:'pncw-fake-gcm-phase-b/v1'})
-  await assert.rejects(()=>adapter.plan({...input,budget:tinyBudget,frozenInputRef:tinyFrozen}),error=>error?.failure?.code==='NO_FEASIBLE_PLAN')
+  const tinyRequest=p.buildProjectionPlanningRequest({schema:'pncw-projection-planning-request/v1',candidates:input.candidates,budget:tinyBudget,selectionPolicy:input.selectionPolicy,authorityContext:{principalId:'not-forwarded',sourceRead:false,surfaceProject:false},frozenInputRef:tinyFrozen})
+  await assert.rejects(()=>adapter.plan({planningRequestId:tinyRequest.planningRequestId,candidates:tinyRequest.candidates,budget:tinyRequest.budget,selectionPolicy:tinyRequest.selectionPolicy,frozenInputRef:tinyRequest.frozenInputRef}),error=>error?.failure?.code==='NO_FEASIBLE_PLAN')
 })
 
 test('fake replan reruns fresh feasibility and binds deterministic lineage', async () => {
