@@ -1,3 +1,6 @@
 export * from './types.js'
 export * from './canonical-decimal.js'
-export * from './validate.js'
+export { assertPlanningFailure } from './validate.js'
+export * from './normalize.js'
+export * from './identity.js'
+export * from './validate-derived.js'

@@ -70,14 +70,26 @@ test('canonical decimal parser rejects non-canonical spellings', async () => {
   assert.throws(()=>assertCanonicalDecimal('-1',{nonNegative:true}))
 })
 
-test('runtime planning assertions accept closed fixtures and reject nested unknowns', async () => {
+test('runtime planning assertions accept builder-derived fixtures and reject nested unknowns', async () => {
   const p=await import('../../dist/packages/planning/src/index.js')
-  const assertions=[
-    p.assertProjectionRouteCandidate,p.assertProjectionBudget,p.assertFrozenPlanningInputRef,p.assertProjectionPlanningRequest,
-    p.assertGcmPlanSnapshot,p.assertProjectionPlanningReceipt,p.assertPlanningFailure,p.assertProjectionReplanRequest,
-  ]
-  for(let i=0;i<assertions.length;i++) assert.deepEqual(assertions[i](fixtures[i]),fixtures[i])
-  assert.throws(()=>p.assertProjectionRouteCandidate({...candidate,demandProfile:{demands:[{...candidate.demandProfile.demands[0],injected:true}]}}))
-  assert.throws(()=>p.assertProjectionPlanningRequest({...request,authorityContext:{...request.authorityContext,injected:true}}))
-  assert.throws(()=>p.assertGcmPlanSnapshot({...plan,conformance:{...conformance,injected:true}}))
+  const derivedCandidate=p.buildProjectionRouteCandidate((({candidateId,...rest})=>rest)(candidate))
+  const derivedBudget=p.buildProjectionBudget((({budgetId,...rest})=>rest)(budget))
+  const candidateSetDigest=p.deriveCandidateSetDigest([derivedCandidate])
+  const policy=request.selectionPolicy
+  const derivedFrozen=p.buildFrozenPlanningInputRef({
+    schema:'pncw-frozen-planning-input/v1',snapshotRef:frozen.snapshotRef,snapshotDigest:frozen.snapshotDigest,
+    gcmPlanningAuthorityDigest:frozen.gcmPlanningAuthorityDigest,candidateSetDigest,
+    budgetDigest:p.deriveBudgetDigest(derivedBudget),policyDigest:p.derivePolicyDigest(policy),provider:'gcm-phase-b',
+    providerContractVersion:frozen.providerContractVersion,
+  })
+  const derivedRequest=p.buildProjectionPlanningRequest({schema:'pncw-projection-planning-request/v1',candidates:[derivedCandidate],budget:derivedBudget,selectionPolicy:policy,authorityContext:request.authorityContext,frozenInputRef:derivedFrozen})
+  const derivedPlan=p.buildGcmPlanSnapshot({schema:'pncw-gcm-plan-snapshot/v1',planningRequestId:derivedRequest.planningRequestId,candidateSetDigest, budgetDigest:p.deriveBudgetDigest(derivedBudget),policyDigest:p.derivePolicyDigest(policy),frozenInputDigest:derivedFrozen.frozenInputDigest,selectedCandidateId:derivedCandidate.candidateId,selectedCandidateDigest:p.candidateSemanticDigest(derivedCandidate),feasibleCandidateIds:[derivedCandidate.candidateId],rejectedCandidates:[],allocationPlanRef:'gcm:plan:1',allocationPlanDigest:D2,policySelectionRef:'gcm:selection:1',policySelectionDigest:D1,allocatorContractVersion:'gcm-allocator-conformance-v0.1',conformance})
+  const derivedReceipt=p.buildProjectionPlanningReceipt({schema:'pncw-projection-planning-receipt/v1',planningRequestId:derivedRequest.planningRequestId,selectedCandidateId:derivedCandidate.candidateId,selectedCandidateDigest:p.candidateSemanticDigest(derivedCandidate),gcmPlanDigest:derivedPlan.planSnapshotDigest,frozenInputDigest:derivedFrozen.frozenInputDigest,conformanceDigest:p.deriveConformanceDigest(conformance),compilerContractVersion:'pncw-plan-compiler/v1'})
+  const derivedReplan={...replan,parentPlanningId:derivedReceipt.planningId,planningRequestId:derivedRequest.planningRequestId,invalidatedCandidateId:derivedCandidate.candidateId,newFrozenInputRef:derivedFrozen}
+  const runtimeFixtures=[derivedCandidate,derivedBudget,derivedFrozen,derivedRequest,derivedPlan,derivedReceipt,failure,derivedReplan]
+  const assertions=[p.assertProjectionRouteCandidate,p.assertProjectionBudget,p.assertFrozenPlanningInputRef,p.assertProjectionPlanningRequest,p.assertGcmPlanSnapshot,p.assertProjectionPlanningReceipt,p.assertPlanningFailure,p.assertProjectionReplanRequest]
+  for(let i=0;i<assertions.length;i++) assert.deepEqual(assertions[i](runtimeFixtures[i]),runtimeFixtures[i])
+  assert.throws(()=>p.assertProjectionRouteCandidate({...derivedCandidate,demandProfile:{demands:[{...derivedCandidate.demandProfile.demands[0],injected:true}]}}))
+  assert.throws(()=>p.assertProjectionPlanningRequest({...derivedRequest,authorityContext:{...derivedRequest.authorityContext,injected:true}}))
+  assert.throws(()=>p.assertGcmPlanSnapshot({...derivedPlan,conformance:{...conformance,injected:true}}))
 })
