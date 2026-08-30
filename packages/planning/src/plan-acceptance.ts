@@ -132,7 +132,6 @@ export function acceptGcmPlan(
   }
 
   const original=candidateMap(request)
-  assertCandidateReferences(plan,original)
   const selected=original.get(plan.selectedCandidateId)
   if(!selected){
     reject('SELECTED_CANDIDATE_INVALID','GCM selected a candidate outside the frozen request set')
@@ -143,6 +142,7 @@ export function acceptGcmPlan(
   if(plan.selectedCandidateDigest!==candidateSemanticDigest(selected)){
     reject('SELECTED_CANDIDATE_INVALID','GCM selected-candidate digest does not match frozen candidate semantics')
   }
+  assertCandidateReferences(plan,original)
 
   if(!plan.allocationPlanRef.trim() || !plan.allocationPlanDigest.startsWith('sha256:')){
     reject('PLAN_INTEGRITY_FAILURE','GCM allocation-plan evidence is missing')
